@@ -24,11 +24,13 @@ class AdListView(ListView):
 
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
+        paginator = Paginator(self.object_list.order_by("-price"), TOTAL_ON_PAGE)
 
-        page_number = int(request.GET.get("page"))
-
-        paginator = Paginator(self.object_list, TOTAL_ON_PAGE)
-        page_obj = paginator.get_page(page_number)
+        try:
+            page_number = int(request.GET.get("page"))
+            page_obj = paginator.get_page(page_number)
+        except TypeError as e:
+            page_obj = paginator.get_page(1)
 
         response = []
         for ad in page_obj:
@@ -59,10 +61,8 @@ class AdCreateView(CreateView):
     def post(self, request, *args, **kwargs):
         ad_data = json.loads(request.body)
         author = get_object_or_404(UserModel, pk=ad_data["author"])
-        try:
-            description = ad_data["description"]
-        except KeyError as e:
-            description = None
+
+        description = ad_data.get("description")
         try:
             is_published = ad_data["is_published"]
         except KeyError as e:

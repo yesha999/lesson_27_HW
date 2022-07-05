@@ -18,9 +18,3 @@ urlpatterns += [path('cat/', cat_views.CatListView.as_view()),
                 path('cat/<int:pk>/update/', cat_views.CatUpdateView.as_view()),
                 path('cat/<int:pk>/delete/', cat_views.CatDeleteView.as_view()),
                 ]
-
-# Для Users
-urlpatterns += []
-
-# Для Locations
-urlpatterns += []

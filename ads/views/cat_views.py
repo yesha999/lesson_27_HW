@@ -16,7 +16,7 @@ class CatListView(ListView):
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
         response = []
-        for category in self.object_list:
+        for category in self.object_list.order_by("name"):
             response.append({
                 "id": category.id,
                 "name": category.name,
