@@ -8,5 +8,5 @@ from ads.views.ad_views import StartView
 urlpatterns = [path('admin/', admin.site.urls),
                path('', StartView.as_view()),
                path('', include("ads.urls")),
-               path('', include("users.urls")),
+               path('users/', include("users.urls")),
                ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

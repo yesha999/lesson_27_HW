@@ -19,8 +19,9 @@ class UserListView(ListView):
 
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
-        paginator = Paginator(self.object_list.order_by("user_name").annotate(total_ads=Count('adsmodel')),
-                              TOTAL_ON_PAGE)
+        paginator = Paginator(
+            self.object_list.prefetch_related("location").order_by("user_name").annotate(total_ads=Count('adsmodel')),
+            TOTAL_ON_PAGE)
 
         try:
             page_number = int(request.GET.get("page"))
@@ -37,7 +38,7 @@ class UserListView(ListView):
                 "user_name": user.user_name,
                 "role": user.role,
                 "age": user.age,
-                "location": user.location.name,
+                "location": list(map(lambda x: x.name, user.location.all())),
                 "total_ads": user.total_ads
             })
 
@@ -61,7 +62,8 @@ class UserCreateView(CreateView):
         location, created = LocationModel.objects.get_or_create(name=user_data["location"])
         user = UserModel.objects.create(first_name=user_data["first_name"], last_name=user_data.get("last_name"),
                                         user_name=user_data["user_name"], password=user_data["password"], role=role,
-                                        age=user_data["age"], location=location)
+                                        age=user_data["age"])
+        user.location.add(location)
         return JsonResponse({
             "id": user.id,
             "first_name": user.first_name,
@@ -69,7 +71,7 @@ class UserCreateView(CreateView):
             "user_name": user.user_name,
             "role": user.role,
             "age": user.age,
-            "location": user.location.name
+            "location": list(map(lambda x: x.name, user.location.all()))
         })
 
 
@@ -79,7 +81,7 @@ class UserDetailView(DetailView):
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
         self.object = self.get_object()
-        qs = UserModel.objects.annotate(total_ads=Count('adsmodel'))
+        qs = UserModel.objects.annotate(total_ads=Count('adsmodel')).prefetch_related("location")
         user = get_object_or_404(qs, pk=self.object.id)
         return JsonResponse({
             "id": self.object.id,
@@ -88,7 +90,7 @@ class UserDetailView(DetailView):
             "user_name": self.object.user_name,
             "role": self.object.role,
             "age": self.object.age,
-            "location": self.object.location.name,
+            "location": list(map(lambda x: x.name, user.location.all())),
             "total_ads": user.total_ads
         })
 
@@ -130,7 +132,13 @@ class UserUpdateView(UpdateView):
         location = user_data.get("location")
         if location:
             location_obj, created = LocationModel.objects.get_or_create(name=location)
-            self.object.location = location_obj
+            self.object.location.clear()
+            self.object.location.add(location_obj)
+
+        location_add = user_data.get("location_add")
+        if location_add:
+            location_obj, created = LocationModel.objects.get_or_create(name=location_add)
+            self.object.location.add(location_obj)
 
         try:
             self.object.full_clean()
@@ -146,7 +154,7 @@ class UserUpdateView(UpdateView):
             "user_name": self.object.user_name,
             "role": self.object.role,
             "age": self.object.age,
-            "location": self.object.location.name
+            "location": list(map(lambda x: x.name, self.object.location.all()))
         })
 
 

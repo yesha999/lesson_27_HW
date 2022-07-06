@@ -24,7 +24,8 @@ class AdListView(ListView):
 
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
-        paginator = Paginator(self.object_list.order_by("-price"), TOTAL_ON_PAGE)
+        paginator = Paginator(self.object_list.order_by("-price").select_related("author", "category"),
+                              TOTAL_ON_PAGE)
 
         try:
             page_number = int(request.GET.get("page"))
@@ -89,7 +90,6 @@ class AdDetailView(DetailView):
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
         self.object = self.get_object()
-
         return JsonResponse({
             "id": self.object.id,
             "name": self.object.name,
