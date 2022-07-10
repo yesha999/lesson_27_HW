@@ -9,4 +9,5 @@ urlpatterns = [path('admin/', admin.site.urls),
                path('', StartView.as_view()),
                path('', include("ads.urls")),
                path('', include("users.urls")),
+               path('selection/', include("selections.urls"))
                ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

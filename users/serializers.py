@@ -1,10 +1,10 @@
-from users.models import UserModel, LocationModel
+from users.models import User, Location
 from rest_framework import serializers
 
 
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
-        model = LocationModel
+        model = Location
         fields = '__all__'
 
 
@@ -16,7 +16,7 @@ class UserListSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = UserModel
+        model = User
         exclude = ['password']
 
 
@@ -24,7 +24,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
     location = serializers.SlugRelatedField(
         many=True,
         required=False,
-        queryset=LocationModel.objects.all(),
+        queryset=Location.objects.all(),
         slug_field="name"
     )
 
@@ -33,16 +33,18 @@ class UserCreateSerializer(serializers.ModelSerializer):
         return super().is_valid(raise_exception=raise_exception)
 
     def create(self, validated_data):
-        user = UserModel.objects.create(**validated_data)
+        user = User.objects.create(**validated_data)
+        user.set_password(validated_data["password"])
 
         for location in self.location:
-            location_obj, created = LocationModel.objects.get_or_create(name=location)
+            location_obj, created = Location.objects.get_or_create(name=location)
             user.location.add(location_obj)
 
+        user.save()
         return user
 
     class Meta:
-        model = UserModel
+        model = User
         fields = "__all__"
 
 
@@ -54,7 +56,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = UserModel
+        model = User
         exclude = ['password']
 
 
@@ -62,7 +64,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     location = serializers.SlugRelatedField(
         many=True,
         required=False,
-        queryset=LocationModel.objects.all(),
+        queryset=Location.objects.all(),
         slug_field="name"
     )
 
@@ -74,17 +76,17 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         user = super().save()
 
         for location in self.location:
-            location_obj, created = LocationModel.objects.get_or_create(name=location)
+            location_obj, created = Location.objects.get_or_create(name=location)
             user.location.add(location_obj)
 
         return user
 
     class Meta:
-        model = UserModel
+        model = User
         exclude = ["password"]
 
 
 class UserDeleteSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserModel
+        model = User
         fields = '__all__'

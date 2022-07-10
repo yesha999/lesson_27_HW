@@ -6,12 +6,12 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView, ListView, CreateView, UpdateView, DeleteView
 
-from ads.models import AdsModel, CategoriesModel
+from ads.models import Ad, Category
 
 
 @method_decorator(csrf_exempt, name='dispatch')
 class CatListView(ListView):
-    model = CategoriesModel
+    model = Category
 
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
@@ -27,12 +27,12 @@ class CatListView(ListView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class CatCreateView(CreateView):
-    model = CategoriesModel
+    model = Category
     fields = ["name"]
 
     def post(self, request, *args, **kwargs):
         cat_data = json.loads(request.body)
-        cat = AdsModel.objects.create(name=cat_data["name"])
+        cat = Ad.objects.create(name=cat_data["name"])
         return JsonResponse({
             "id": cat.id,
             "name": cat.name,
@@ -40,7 +40,7 @@ class CatCreateView(CreateView):
 
 
 class CatDetailView(DetailView):
-    model = CategoriesModel
+    model = Category
 
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
@@ -54,7 +54,7 @@ class CatDetailView(DetailView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class CatUpdateView(UpdateView):
-    model = CategoriesModel
+    model = Category
     fields = ["name"]
 
     def patch(self, request, *args, **kwargs):
@@ -80,7 +80,7 @@ class CatUpdateView(UpdateView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class CatDeleteView(DeleteView):
-    model = CategoriesModel
+    model = Category
     success_url = "/"
 
     def delete(self, request, *args, **kwargs):
