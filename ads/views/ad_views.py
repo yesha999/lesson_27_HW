@@ -82,6 +82,12 @@ class AdCreateView(CreateAPIView):
     serializer_class = AdCreateSerializer
     permission_classes = [IsAuthenticated]
 
+    def perform_create(self, serializer):
+        user = self.request.user
+        serializer.save(author=user)
+
+
+
 
 class AdDetailView(RetrieveAPIView):
     queryset = Ad.objects.all()
