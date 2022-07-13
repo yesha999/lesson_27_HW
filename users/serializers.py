@@ -1,5 +1,6 @@
-from users.models import User, Location
 from rest_framework import serializers
+
+from users.models import User, Location
 
 
 class LocationSerializer(serializers.ModelSerializer):

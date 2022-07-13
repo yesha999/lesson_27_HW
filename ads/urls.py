@@ -8,7 +8,6 @@ urlpatterns = [
     path('ad/<int:pk>/', ad_views.AdDetailView.as_view()),
     path('ad/<int:pk>/update/', ad_views.AdUpdateView.as_view()),
     path('ad/<int:pk>/delete/', ad_views.AdDeleteView.as_view()),
-    path('ad/<int:pk>/upload_image/', ad_views.AdImageView.as_view()),
 ]
 
 # Для Categories
