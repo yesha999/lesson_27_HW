@@ -1,12 +1,13 @@
 import pytest
-from tests.factories import UserFactory, LocationFactory
+
+from tests.factories import LocationFactory, UserFactory
 
 
 @pytest.fixture
 @pytest.mark.django_db
-def access_token(client, django_user_model, user):
-    # location = LocationFactory.create()
-    # user = UserFactory.create(location=(location,))
+def access_token(client, django_user_model):
+    location = LocationFactory.create()
+    user = UserFactory.create(location=(location,))
     django_user_model.objects.create_user(username="test", password=user.password, birth_date=user.birth_date,
                                           email="test@test.test")
     response = client.post(
