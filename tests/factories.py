@@ -44,7 +44,7 @@ class AdFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Ad
 
-    name = "test name"
+    name = "test ad name"
     author = factory.SubFactory(UserFactory)
     price = 10000
     description = "test description"

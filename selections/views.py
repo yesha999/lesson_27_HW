@@ -18,6 +18,10 @@ class SelectionCreateView(CreateAPIView):
     serializer_class = SelectionCreateSerializer
     permission_classes = [IsAuthenticated]
 
+    def perform_create(self, serializer):
+        user = self.request.user
+        serializer.save(owner=user)
+
 
 class SelectionDetailView(RetrieveAPIView):
     queryset = Selection.objects.all()
